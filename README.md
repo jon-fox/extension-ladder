@@ -58,6 +58,18 @@ Certain sites may display missing images or encounter formatting issues. This ca
 
 > **Warning:** If your instance will be publicly accessible, make sure to enable Basic Auth. This will prevent unauthorized users from using your proxy. If you do not enable Basic Auth, anyone can use your proxy to browse nasty/illegal stuff. And you will be responsible for it.
 
+### Local Development
+1) Install Go: `brew install go`
+2) Clone the repo: `git clone https://github.com/jon-fox/extension-ladder.git`
+3) Run the start script:
+```bash
+cd extension-ladder
+./local_start.sh
+```
+4) Open Browser (Default: http://localhost:8080)
+
+> The `local_start.sh` script will automatically kill any existing process on port 8080 before starting.
+
 ### Binary
 1) Download binary [here](https://github.com/jon-fox/extension-ladder/releases/latest)
 2) Unpack and run the binary `./ladder -r https://t.ly/14PSf`
