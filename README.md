@@ -2,7 +2,7 @@
     <img src="assets/extension_ladder.png" width="100px">
 </p>
 
-<h1 align="center">Ladder</h1>
+<h1 align="center">Extension Ladder</h1>
 <div><img alt="License" src="https://img.shields.io/github/license/jon-fox/extension-ladder"> <img alt="go.mod Go version " src="https://img.shields.io/github/go-mod/go-version/jon-fox/extension-ladder"> <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/jon-fox/extension-ladder"> <img alt="GitHub (Pre-)Release Date" src="https://img.shields.io/github/release-date-pre/jon-fox/extension-ladder"> <img alt="GitHub Downloads all releases" src="https://img.shields.io/github/downloads/jon-fox/extension-ladder/total"> <img alt="GitHub Build Status (with event)" src="https://img.shields.io/github/actions/workflow/status/jon-fox/extension-ladder/release-binaries.yaml"></div>
 
 
