@@ -44,7 +44,7 @@ Uses [pnpm](https://pnpm.io/) + [Tailwind CSS](https://tailwindcss.com/) for sty
 
 ### Binary
 1) Download binary [here](https://github.com/jon-fox/extension-ladder/releases/latest)
-2) Unpack and run the binary `./extension-ladder -r https://t.ly/14PSf`
+2) Unpack and run the binary `./extension-ladder -r https://raw.githubusercontent.com/jon-fox/extension-ladder/main/ruleset.yaml`
 3) Open Browser (Default: http://localhost:8080)
 
 ## Usage Options
