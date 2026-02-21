@@ -12,29 +12,20 @@ Ads are everywhere and I'm tired of it
 > **Disclaimer:** Don't use if interested in seeing ads
 
 ### How it works
-
 It does a lot of the time, if it doesn't then please contribute to fix it
-
-### Features
-- [x] Bypass paywalls (Googlebot UA, headless Chrome, archive.org fallback chain)
-- [x] Reader Mode — clean article view by default, press R for raw
-- [x] Bot detection bypass (Cloudflare, PerimeterX)
-- [x] Script stripping for JS-gated content
-- [x] Domain-based rulesets
-- [x] API & raw HTML endpoints
-- [x] Docker, Helm, binary support
-- [x] Basic Auth, no tracking
-- [x] Removes most ads
 
 ### Reader Mode
 Every proxied page opens in Reader Mode by default — a clean, distraction-free view with just the article text. No ads, no popups, no clutter. Press **R** or click **View Raw Page** to see the original site.
 
 ### Limitations
-Not all sites work. Some block crawlers entirely, and archive.org won't have very recent articles. Reader Mode can often still extract the article content even when the page appears gated. If a site doesn't work, add a ruleset for it or contribute a fix.
+Not all sites work. Some block crawlers entirely, and archive.org won't have very recent articles. 
 
-## Installation
+Reader Mode can often still extract the article content even when the page appears gated. 
 
-### Local Development
+If a site doesn't work, add a ruleset for it or contribute a fix.
+
+## Local Development
+
 1) Install Go: `brew install go`
 2) Install Chrome (required for headless browser fallback): `brew install --cask google-chrome`
 3) Clone the repo: `git clone https://github.com/jon-fox/extension-ladder.git`
@@ -43,30 +34,18 @@ Not all sites work. Some block crawlers entirely, and archive.org won't have ver
 cd extension-ladder
 ./local_start.sh
 ```
-4) Open Browser (Default: http://localhost:8080)
+5) Open Browser (Default: http://localhost:8080)
 
-> The `local_start.sh` script will automatically kill any existing process on port 8080 before starting.
+> `local_start.sh` automatically kills any existing process on port 8080 before starting.
+
+Uses [pnpm](https://pnpm.io/) + [Tailwind CSS](https://tailwindcss.com/) for styles. Run `pnpm build` after modifying `form.html`.
 
 ### Binary
 1) Download binary [here](https://github.com/jon-fox/extension-ladder/releases/latest)
 2) Unpack and run the binary `./ladder -r https://t.ly/14PSf`
 3) Open Browser (Default: http://localhost:8080)
 
-### Docker
-```bash
-docker run -p 8080:8080 -d --env RULESET=https://t.ly/14PSf --name ladder ghcr.io/jon-fox/extension-ladder:latest
-```
-
-### Docker Compose
-```bash
-curl https://raw.githubusercontent.com/jon-fox/extension-ladder/main/docker-compose.yaml --output docker-compose.yaml
-docker-compose up -d
-```
-
-### Helm
-See [README.md](/helm-chart/README.md) in helm-chart sub-directory for more information.
-
-## Usage
+## Usage Options
 
 ### Browser
 1) Open Browser (Default: http://localhost:8080)
@@ -141,26 +120,5 @@ YAML-based rules per domain. Loaded from a file, directory, or URL on startup.
         <script>window.localStorage.clear();</script>
 ```
 
-## Development
-
-```bash
-./local_start.sh
-```
-
-Or manually:
-```bash
-echo "dev" > handlers/VERSION
-RULESET="./ruleset.yaml" go run cmd/main.go
-```
-
-### Optional: Live reloading development server with [cosmtrek/air](https://github.com/cosmtrek/air)
-
-Install air according to the [installation instructions](https://github.com/cosmtrek/air#installation). 
-
-Run a development server at http://localhost:8080:
-
-```bash
-air # or the path to air if you haven't added a path alias to your .bashrc or .zshrc
-```
-
-This project uses [pnpm](https://pnpm.io/) to build a stylesheet with the [Tailwind CSS](https://tailwindcss.com/) classes. For local development, if you modify styles in `form.html`, run `pnpm build` to generate a new stylesheet.
+## Contributing
+I want people to contribute and make this better. I don't like ads
