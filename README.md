@@ -40,7 +40,7 @@ cd extension-ladder
 
 > `local_start.sh` automatically kills any existing process on port 8080 before starting.
 
-Uses [pnpm](https://pnpm.io/) + [Tailwind CSS](https://tailwindcss.com/) for styles. Run `pnpm build` after modifying `form.html`.
+> **Styles:** Uses [pnpm](https://pnpm.io/) + [Tailwind CSS](https://tailwindcss.com/). Only needed if editing `form.html` — run `pnpm build` to regenerate CSS.
 
 ### Binary
 1) Download binary [here](https://github.com/jon-fox/extension-ladder/releases/latest)
@@ -88,7 +88,7 @@ http://localhost:8080/ruleset
 | `LOG_URLS` | Log fetched URL's | `true` |
 | `DISABLE_FORM` | Disables URL Form Frontpage | `false` |
 | `FORM_PATH` | Path to custom Form HTML | `` |
-| `RULESET` | Path or URL to a ruleset file, accepts local directories | `https://raw.githubusercontent.com/jon-fox/extension-ladder-rules/main/ruleset.yaml` or `/path/to/my/rules.yaml` or `/path/to/my/rules/` |
+| `RULESET` | Path or URL to a ruleset file, accepts local directories | `https://raw.githubusercontent.com/jon-fox/extension-ladder/main/ruleset.yaml` or `/path/to/my/rules.yaml` or `/path/to/my/rules/` |
 | `EXPOSE_RULESET` | Make your Ruleset available to other ladders | `true` |
 | `ALLOWED_DOMAINS` | Comma separated list of allowed domains. Empty = no limitations | `` |
 | `ALLOWED_DOMAINS_RULESET` | Allow Domains from Ruleset. false = no limitations | `false` |
