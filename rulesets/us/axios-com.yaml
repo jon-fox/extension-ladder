@@ -1,0 +1,20 @@
+- domain: www.axios.com
+  domains:
+    - axios.com
+  headers:
+    user-agent: Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+    x-forwarded-for: none
+    referer: https://www.google.com/
+    cookie: ""
+  fetchStrategy: headless+archive
+  headlessWaitSeconds: 8
+  stripScripts: true
+  botDetectionPatterns:
+    - "subscribe to read"
+    - "sign in to read"
+    - "unusual activity"
+  regexRules:
+    - match: <div[^>]*class="[^"]*paywall[^"]*"[^>]*>.*?</div>
+      replace: ""
+    - match: <div[^>]*class="[^"]*gate[^"]*"[^>]*>.*?</div>
+      replace: ""

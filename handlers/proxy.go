@@ -46,6 +46,20 @@ func extractUrl(c *fiber.Ctx) (string, error) {
 		reqUrl = c.Params("*")
 	}
 
+	// Strip self-referencing localhost/proxy prefix from URLs
+	// e.g. http://localhost:8080/https://realsite.com -> https://realsite.com
+	localhostPrefixes := []string{
+		"http://localhost:" + c.Port() + "/",
+		"https://localhost:" + c.Port() + "/",
+		"http://" + c.Hostname() + ":" + c.Port() + "/",
+		"https://" + c.Hostname() + ":" + c.Port() + "/",
+	}
+	for _, prefix := range localhostPrefixes {
+		for strings.HasPrefix(reqUrl, prefix) {
+			reqUrl = strings.TrimPrefix(reqUrl, prefix)
+		}
+	}
+
 	// Extract the actual path from req ctx
 	urlQuery, err := url.Parse(reqUrl)
 	if err != nil {
@@ -98,6 +112,25 @@ func ProxySite(rulesetPath string) fiber.Handler {
 	}
 
 	return func(c *fiber.Ctx) error {
+		// Block Cloudflare challenge/infrastructure paths - these can't be proxied
+		reqPath := c.Params("*")
+		if strings.HasPrefix(reqPath, "cdn-cgi/") {
+			return c.SendStatus(fiber.StatusNoContent)
+		}
+
+		// Redirect if the URL has a localhost prefix to keep the browser URL clean
+		localhostPrefix := "http://localhost:" + c.Port() + "/"
+		if strings.HasPrefix(reqPath, localhostPrefix) || strings.HasPrefix(reqPath, "http://"+c.Hostname()+":"+c.Port()+"/") {
+			clean := reqPath
+			for strings.HasPrefix(clean, localhostPrefix) {
+				clean = strings.TrimPrefix(clean, localhostPrefix)
+			}
+			for strings.HasPrefix(clean, "http://"+c.Hostname()+":"+c.Port()+"/") {
+				clean = strings.TrimPrefix(clean, "http://"+c.Hostname()+":"+c.Port()+"/")
+			}
+			return c.Redirect("/" + clean)
+		}
+
 		// Get the url from the URL
 		url, err := extractUrl(c)
 		if err != nil {
@@ -239,8 +272,16 @@ var defaultBotPatterns = []string{
 	"security check",
 }
 
-// isBotDetected checks if the response body contains indicators of a bot-detection page
+// isBotDetected checks if the response body contains indicators of a bot-detection page.
+// Large pages (>50KB) are unlikely(i guess) to be challenge pages — Cloudflare and similar services
+// inject monitoring scripts even into successfully served pages.
 func isBotDetected(body string, rule ruleset.Rule) bool {
+	// If the page is large, it's almost certainly real content with
+	// embedded monitoring scripts, not a challenge/block page
+	if len(body) > 50000 {
+		return false
+	}
+
 	lowerBody := strings.ToLower(body)
 
 	// Check rule-specific patterns first
@@ -292,8 +333,26 @@ func fetchWithStrategy(u *url.URL, rule ruleset.Rule, strategy string) (string, 
 		return "", nil, nil, err
 	}
 
+	// For headless fetches, strip all script tags since JS already executed
+	// server-side. This prevents client-side JS from re-gating content.
+	if strategy == "headless" || rule.StripScripts {
+		body = stripScriptTags(body)
+	}
+
 	body = rewriteHtml([]byte(body), u, rule)
 	return body, nil, nil, nil
+}
+
+// stripScriptTags removes all <script> tags (inline and external) from HTML.
+// Used for headless-fetched content where JS has already executed server-side.
+func stripScriptTags(body string) string {
+	// Remove script tags with content
+	re := regexp.MustCompile(`(?is)<script[^>]*>.*?</script>`)
+	body = re.ReplaceAllString(body, "")
+	// Remove self-closing script tags
+	re2 := regexp.MustCompile(`(?i)<script[^>]*/>`)
+	body = re2.ReplaceAllString(body, "")
+	return body
 }
 
 // httpFetch performs the standard HTTP fetch (extracted from the original fetchSite)
@@ -371,7 +430,9 @@ func rewriteHtml(bodyB []byte, u *url.URL, rule ruleset.Rule) string {
 	body = reScript.ReplaceAllString(body, fmt.Sprintf(`<script $1 script="%s$3"`, "/https://"+u.Host+"/"))
 
 	// body = strings.ReplaceAll(body, "srcset=\"/", "srcset=\"/https://"+u.Host+"/") // TODO: Needs a regex to rewrite the URL's
-	body = strings.ReplaceAll(body, "href=\"/", "href=\"/https://"+u.Host+"/")
+	// Rewrite relative hrefs but skip those already rewritten (starting with /http)
+	hrefRelPattern := regexp.MustCompile(`href="/([^h][^"]*)"`) // match href="/... but not href="/http...
+	body = hrefRelPattern.ReplaceAllString(body, `href="/https://`+u.Host+`/$1"`)
 	body = strings.ReplaceAll(body, "url('/", "url('/https://"+u.Host+"/")
 	body = strings.ReplaceAll(body, "url(/", "url(/https://"+u.Host+"/")
 	body = strings.ReplaceAll(body, "href=\"https://"+u.Host, "href=\"/https://"+u.Host+"/")

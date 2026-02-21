@@ -55,6 +55,10 @@ type Rule struct {
 	// If any of these are found in the response body, fallback strategies are triggered
 	BotDetectionPatterns []string `yaml:"botDetectionPatterns,omitempty"`
 
+	// StripScripts removes all <script> tags from the response.
+	// Useful for sites where headless fetch renders the content but client-side JS re-gates it.
+	StripScripts bool `yaml:"stripScripts,omitempty"`
+
 	URLMods struct {
 		Domain []Regex `yaml:"domain,omitempty"`
 		Path   []Regex `yaml:"path,omitempty"`
