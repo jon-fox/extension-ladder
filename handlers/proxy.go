@@ -379,6 +379,10 @@ func rewriteHtml(bodyB []byte, u *url.URL, rule ruleset.Rule) string {
 	if os.Getenv("RULESET") != "" {
 		body = applyRules(body, rule)
 	}
+
+	// Inject reader mode toggle into proxied pages
+	body = injectReaderMode(body)
+
 	return body
 }
 
