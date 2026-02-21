@@ -99,8 +99,9 @@ func main() {
 
 	app := fiber.New(
 		fiber.Config{
-			Prefork: *prefork,
-			GETOnly: true,
+			Prefork:        *prefork,
+			GETOnly:        true,
+			ReadBufferSize: 16384, // 16KB - prevents 431 errors from large cookie headers
 		},
 	)
 

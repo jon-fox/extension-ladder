@@ -3,60 +3,36 @@
 </p>
 
 <h1 align="center">Extension Ladder</h1>
-<div><img alt="License" src="https://img.shields.io/github/license/jon-fox/extension-ladder"> <img alt="go.mod Go version " src="https://img.shields.io/github/go-mod/go-version/jon-fox/extension-ladder"> <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/jon-fox/extension-ladder"> <img alt="GitHub (Pre-)Release Date" src="https://img.shields.io/github/release-date-pre/jon-fox/extension-ladder"> <img alt="GitHub Downloads all releases" src="https://img.shields.io/github/downloads/jon-fox/extension-ladder/total"> <img alt="GitHub Build Status (with event)" src="https://img.shields.io/github/actions/workflow/status/jon-fox/extension-ladder/release-binaries.yaml"></div>
 
-
-*Ladder is a http web proxy.* This is a selfhosted version of [1ft.io](https://1ft.io) and [12ft.io](https://12ft.io). It is inspired by [13ft](https://github.com/wasi-master/13ft).
 
 ### Why
 
-Freedom of information is an essential pillar of democracy and informed decision-making. While media organizations have legitimate financial interests, it is crucial to strike a balance between profitability and the public's right to access information. The proliferation of paywalls raises concerns about the erosion of this fundamental freedom, and it is imperative for society to find innovative ways to preserve access to vital information without compromising the sustainability of journalism. In a world where knowledge should be shared and not commodified, paywalls should be critically examined to ensure that they do not undermine the principles of an open and informed society.
+Ads are everywhere and I'm tired of it
 
-> **Disclaimer:** This project is intended for educational purposes only. The author does not endorse or encourage any unethical or illegal activity. Use this tool at your own risk.
+> **Disclaimer:** Don't use if interested in seeing ads
 
 ### How it works
 
-```mermaid
-sequenceDiagram
-    client->>+ladder: GET
-    ladder-->>ladder: apply RequestModifications
-    ladder->>+website: GET
-    website->>-ladder: 200 OK
-    ladder-->>ladder: apply ResultModifications
-    ladder->>-client: 200 OK
-```
+It does a lot of the time, if it doesn't then please contribute to fix it
 
 ### Features
-- [x] Bypass Paywalls
-- [x] Remove CORS headers from responses, assets, and images ...
-- [x] Apply domain based ruleset/code to modify response / requested URL
-- [x] Keep site browsable
-- [x] API
-- [x] Fetch RAW HTML
-- [x] Custom User Agent
-- [x] Custom X-Forwarded-For IP
-- [x] [Docker container](https://github.com/jon-fox/extension-ladder/pkgs/container/extension-ladder) (amd64, arm64)
-- [x] Linux binary
-- [x] Mac OS binary
-- [x] Windows binary (untested)
-- [x] Removes most of the ads (unexpected side effect ¯\\\_(ツ)_/¯ )
-- [x] Basic Auth
-- [x] Disable logs
-- [x] No Tracking
-- [x] Limit the proxy to a list of domains
-- [x] Expose Ruleset to other ladders
-- [x] Fetch from Google Cache
-- [ ] Optional TOR proxy
-- [ ] A key to share only one URL
+- [x] Bypass paywalls (Googlebot UA, headless Chrome, archive.org fallback chain)
+- [x] Reader Mode — clean article view by default, press R for raw
+- [x] Bot detection bypass (Cloudflare, PerimeterX)
+- [x] Script stripping for JS-gated content
+- [x] Domain-based rulesets
+- [x] API & raw HTML endpoints
+- [x] Docker, Helm, binary support
+- [x] Basic Auth, no tracking
+- [x] Removes most ads
+
+### Reader Mode
+Every proxied page opens in Reader Mode by default — a clean, distraction-free view with just the article text. No ads, no popups, no clutter. Press **R** or click **View Raw Page** to see the original site.
 
 ### Limitations
-Some sites do not expose their content to search engines, which means that the proxy cannot access the content. A future version will try to fetch the content from Google Cache.
-
-Certain sites may display missing images or encounter formatting issues. This can be attributed to the site's reliance on JavaScript or CSS for image and resource loading, which presents a limitation when accessed through this proxy. If you prefer a full experience, please consider buying a subscription for the site.
+Not all sites work. Some block crawlers entirely, and archive.org won't have very recent articles. Reader Mode can often still extract the article content even when the page appears gated. If a site doesn't work, add a ruleset for it or contribute a fix.
 
 ## Installation
-
-> **Warning:** If your instance will be publicly accessible, make sure to enable Basic Auth. This will prevent unauthorized users from using your proxy. If you do not enable Basic Auth, anyone can use your proxy to browse nasty/illegal stuff. And you will be responsible for it.
 
 ### Local Development
 1) Install Go: `brew install go`
@@ -140,67 +116,38 @@ http://localhost:8080/ruleset
 
 ### Ruleset
 
-It is possible to apply custom rules to modify the response or the requested URL. This can be used to remove unwanted or modify elements from the page. The ruleset is a YAML file, a directory with YAML Files, or an URL to a YAML file that contains a list of rules for each domain. These rules are loaded on startup.
-
-There is a basic ruleset available in a separate repository [ruleset.yaml](https://raw.githubusercontent.com/jon-fox/extension-ladder-rules/main/ruleset.yaml). Feel free to add your own rules and create a pull request.
-
+YAML-based rules per domain. Loaded from a file, directory, or URL on startup.
 
 ```yaml
-- domain: example.com          # Includes all subdomains
-  domains:                     # Additional domains to apply the rule
+- domain: example.com
+  domains:
     - www.example.de
-    - www.beispiel.de
   headers:
-    x-forwarded-for: none      # override X-Forwarded-For header or delete with none
-    referer: none              # override Referer header or delete with none
-    user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
-    content-security-policy: script-src 'self'; # override response header
+    user-agent: Mozilla/5.0 ...
+    x-forwarded-for: none
+    referer: none
     cookie: privacy=1
+  fetchStrategy: headless+archive  # default, headless, archive, headless+archive
+  headlessWaitSeconds: 8
+  stripScripts: true
+  botDetectionPatterns:
+    - "unusual activity"
   regexRules:
-    - match: <script\s+([^>]*\s+)?src="(/)([^"]*)"
-      replace: <script $1 script="/https://www.example.com/$3"
+    - match: <div class="paywall">.*?</div>
+      replace: ""
   injections:
-    - position: head # Position where to inject the code
-      append: |      # possible keys: append, prepend, replace
-        <script>
-          window.localStorage.clear();
-          console.log("test");
-          alert("Hello!");
-        </script>
-- domain: www.anotherdomain.com # Domain where the rule applies
-  paths:                        # Paths where the rule applies
-    - /article
-  googleCache: false            # Use Google Cache to fetch the content
-  regexRules:                   # Regex rules to apply
-    - match: <script\s+([^>]*\s+)?src="(/)([^"]*)"
-      replace: <script $1 script="/https://www.example.com/$3"
-  injections:
-    - position: .left-content article .post-title # Position where to inject the code into DOM
-      replace: | 
-        <h1>My Custom Title</h1>
-    - position: .left-content article # Position where to inject the code into DOM
-      prepend: | 
-        <h2>Subtitle</h2>
-- domain: demo.com
-  headers:
-    content-security-policy: script-src 'self';
-    user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
-  urlMods:              # Modify the URL
-    query:              
-      - key: amp        # (this will append ?amp=1 to the URL)
-        value: 1 
-    domain:             
-      - match: www      # regex to match part of domain
-        replace: amp    # (this would modify the domain from www.demo.de to amp.demo.de)
-    path:               
-      - match: ^        # regex to match part of path
-        replace: /amp/  # (modify the url from https://www.demo.com/article/ to https://www.demo.de/amp/article/)
+    - position: head
+      append: |
+        <script>window.localStorage.clear();</script>
 ```
 
 ## Development
 
-To run a development server at http://localhost:8080:
+```bash
+./local_start.sh
+```
 
+Or manually:
 ```bash
 echo "dev" > handlers/VERSION
 RULESET="./ruleset.yaml" go run cmd/main.go

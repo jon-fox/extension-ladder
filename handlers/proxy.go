@@ -112,9 +112,9 @@ func ProxySite(rulesetPath string) fiber.Handler {
 	}
 
 	return func(c *fiber.Ctx) error {
-		// Block Cloudflare challenge/infrastructure paths - these can't be proxied
+		// Block paths that shouldn't be proxied
 		reqPath := c.Params("*")
-		if strings.HasPrefix(reqPath, "cdn-cgi/") {
+		if strings.HasPrefix(reqPath, "cdn-cgi/") || strings.HasPrefix(reqPath, ".well-known/") {
 			return c.SendStatus(fiber.StatusNoContent)
 		}
 
