@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"ladder/handlers"
-	"ladder/handlers/cli"
+	"extension-ladder/handlers"
+	"extension-ladder/handlers/cli"
 
 	"github.com/akamensky/argparse"
 	"github.com/gofiber/fiber/v2"
@@ -29,7 +29,7 @@ var logoData []byte
 var loadingPhrasesData []byte
 
 func main() {
-	parser := argparse.NewParser("ladder", "Every Wall needs a Ladder")
+	parser := argparse.NewParser("extension-ladder", "Every Wall needs an Extension Ladder")
 
 	portEnv := os.Getenv("PORT")
 	if os.Getenv("PORT") == "" {

@@ -16,5 +16,5 @@ env:
   ALLOWED_DOMAINS_RULESET: "false"
 
 ingress:
-  HOST: "ladder.domain.com"
+  HOST: "extension-ladder.domain.com"
   PORT: 80

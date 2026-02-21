@@ -1,11 +1,11 @@
 version: '3'
 services:
-  ladder:
+  extension-ladder:
     image: ghcr.io/jon-fox/extension-ladder:latest
-    container_name: ladder
+    container_name: extension-ladder
     #build: .
     #restart: always
-    #command: sh -c ./ladder
+    #command: sh -c ./extension-ladder
     environment:
       - PORT=8080
       - RULESET=/app/ruleset.yaml

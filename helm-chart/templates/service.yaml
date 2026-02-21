@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: ladder-service
+  name: extension-ladder-service
 spec:
   type: ClusterIP
   selector:
-    app: ladder
+    app: extension-ladder
   ports:
   - name: http
     port: {{ .Values.ingress.PORT }}

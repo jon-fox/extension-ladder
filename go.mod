@@ -1,4 +1,4 @@
-module ladder
+module extension-ladder
 
 go 1.24
 

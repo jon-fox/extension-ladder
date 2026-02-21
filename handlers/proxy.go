@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"ladder/pkg/ruleset"
+	"extension-ladder/pkg/ruleset"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gofiber/fiber/v2"

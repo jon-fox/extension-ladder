@@ -1,5 +1,5 @@
 apiVersion: v2
-name: ladder
+name: extension-ladder
 description: A helm chart to deploy jon-fox/extension-ladder 
 type: application
 version: "1.0"

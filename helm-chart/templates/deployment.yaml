@@ -3,22 +3,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: ladder
-  name: ladder
+    app: extension-ladder
+  name: extension-ladder
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ladder
+      app: extension-ladder
   template:
     metadata:
       labels:
-        app: ladder
+        app: extension-ladder
     spec:
       containers:
       - image: "{{ .Values.image.RELEASE }}"
         imagePullPolicy: Always
-        name: ladder
+        name: extension-ladder
         resources:
           limits:
             cpu: 250m
