@@ -7,12 +7,14 @@
 
 ### Why
 
-Ads are everywhere and I'm tired of it
+Ads are everywhere and I'm tired of it. 
+
+Extending the original ladder project to maintain it and include more features
 
 > **Disclaimer:** Don't use if interested in seeing ads
 
 ### How it works
-It does a lot of the time, if it doesn't then please contribute to fix it
+It does a lot of the time, if it doesn't then please open an issue or consider contributing to fix it
 
 ### Reader Mode
 Every proxied page opens in Reader Mode by default — a clean, distraction-free view with just the article text. No ads, no popups, no clutter. Press **R** or click **View Raw Page** to see the original site.
