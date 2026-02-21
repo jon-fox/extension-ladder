@@ -113,8 +113,12 @@ func ProxySite(rulesetPath string) fiber.Handler {
 		}
 
 		c.Cookie(&fiber.Cookie{})
-		c.Set("Content-Type", resp.Header.Get("Content-Type"))
-		c.Set("Content-Security-Policy", resp.Header.Get("Content-Security-Policy"))
+		if resp != nil {
+			c.Set("Content-Type", resp.Header.Get("Content-Type"))
+			c.Set("Content-Security-Policy", resp.Header.Get("Content-Security-Policy"))
+		} else {
+			c.Set("Content-Type", "text/html; charset=utf-8")
+		}
 
 		return c.SendString(body)
 	}
@@ -181,7 +185,120 @@ func fetchSite(urlpath string, queries map[string]string) (string, *http.Request
 
 	// Modify the URI according to ruleset
 	rule := fetchRule(u.Host, u.Path)
-	url, err := modifyURL(u.String()+urlQuery, rule)
+
+	// If the rule specifies a non-default fetch strategy, use it directly
+	strategy := strings.ToLower(rule.FetchStrategy)
+	if strategy == "headless" {
+		return fetchWithStrategy(u, rule, "headless")
+	} else if strategy == "archive" {
+		return fetchWithStrategy(u, rule, "archive")
+	}
+
+	// Standard HTTP fetch
+	body, req, resp, err := httpFetch(u, urlQuery, rule)
+	if err != nil {
+		return "", nil, nil, err
+	}
+
+	// Check for bot detection in the response
+	if isBotDetected(body, rule) {
+		log.Printf("WARN: Bot detection triggered for %s, attempting fallback strategies", u.String())
+
+		// Determine fallback chain
+		fallbacks := determineFallbacks(strategy)
+		for _, fb := range fallbacks {
+			log.Printf("INFO: Trying fallback strategy: %s for %s", fb, u.String())
+			fbBody, _, _, fbErr := fetchWithStrategy(u, rule, fb)
+			if fbErr != nil {
+				log.Printf("WARN: Fallback '%s' failed for %s: %v", fb, u.String(), fbErr)
+				continue
+			}
+			// Check if the fallback also got bot-detected
+			if isBotDetected(fbBody, rule) {
+				log.Printf("WARN: Fallback '%s' also got bot-detected for %s", fb, u.String())
+				continue
+			}
+			log.Printf("INFO: Fallback '%s' succeeded for %s", fb, u.String())
+			return fbBody, req, resp, nil
+		}
+		log.Printf("WARN: All fallback strategies failed for %s, returning original response", u.String())
+	}
+
+	return body, req, resp, nil
+}
+
+// Default bot detection patterns that indicate a challenge/block page
+var defaultBotPatterns = []string{
+	"unusual activity",
+	"automated (bot) activity",
+	"captcha",
+	"challenge-platform",
+	"please verify you are a human",
+	"access denied",
+	"bot detection",
+	"security check",
+}
+
+// isBotDetected checks if the response body contains indicators of a bot-detection page
+func isBotDetected(body string, rule ruleset.Rule) bool {
+	lowerBody := strings.ToLower(body)
+
+	// Check rule-specific patterns first
+	for _, pattern := range rule.BotDetectionPatterns {
+		if strings.Contains(lowerBody, strings.ToLower(pattern)) {
+			return true
+		}
+	}
+
+	// Check default patterns
+	for _, pattern := range defaultBotPatterns {
+		if strings.Contains(lowerBody, pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+// determineFallbacks returns the ordered list of fallback strategies to try
+func determineFallbacks(strategy string) []string {
+	switch strategy {
+	case "headless+archive":
+		return []string{"headless", "archive"}
+	case "archive+headless":
+		return []string{"archive", "headless"}
+	case "":
+		// Default: try headless first, then archive
+		return []string{"headless", "archive"}
+	default:
+		return []string{"headless", "archive"}
+	}
+}
+
+// fetchWithStrategy fetches using a specific strategy and applies HTML rewriting
+func fetchWithStrategy(u *url.URL, rule ruleset.Rule, strategy string) (string, *http.Request, *http.Response, error) {
+	var body string
+	var err error
+
+	switch strategy {
+	case "headless":
+		body, err = fetchWithHeadless(u.String(), rule.HeadlessWaitSeconds)
+	case "archive":
+		body, err = fetchFromArchive(u.String())
+	default:
+		return "", nil, nil, fmt.Errorf("unknown fetch strategy: %s", strategy)
+	}
+
+	if err != nil {
+		return "", nil, nil, err
+	}
+
+	body = rewriteHtml([]byte(body), u, rule)
+	return body, nil, nil, nil
+}
+
+// httpFetch performs the standard HTTP fetch (extracted from the original fetchSite)
+func httpFetch(u *url.URL, urlQuery string, rule ruleset.Rule) (string, *http.Request, *http.Response, error) {
+	modifiedURL, err := modifyURL(u.String()+urlQuery, rule)
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -190,7 +307,7 @@ func fetchSite(urlpath string, queries map[string]string) (string, *http.Request
 	client := &http.Client{
 		Timeout: time.Second * time.Duration(defaultTimeout),
 	}
-	req, _ := http.NewRequest("GET", url, nil)
+	req, _ := http.NewRequest("GET", modifiedURL, nil)
 
 	if rule.Headers.UserAgent != "" {
 		req.Header.Set("User-Agent", rule.Headers.UserAgent)

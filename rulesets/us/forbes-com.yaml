@@ -1,0 +1,17 @@
+- domain: www.forbes.com
+  domains:
+    - forbes.com
+  headers:
+    user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36
+    x-forwarded-for: none
+    referer: https://www.google.com/
+    cookie: ""
+  fetchStrategy: headless+archive
+  headlessWaitSeconds: 8
+  botDetectionPatterns:
+    - "unusual activity"
+    - "automated (bot) activity"
+    - "We detected unusual activity"
+  regexRules:
+    - match: <div class="paywall[^"]*"[^>]*>.*?</div>
+      replace: ""

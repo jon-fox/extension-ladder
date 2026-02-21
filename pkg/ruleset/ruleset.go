@@ -40,6 +40,21 @@ type Rule struct {
 	GoogleCache bool    `yaml:"googleCache,omitempty"`
 	RegexRules  []Regex `yaml:"regexRules,omitempty"`
 
+	// FetchStrategy defines how to fetch the page. Options:
+	// "default" or "" - standard HTTP fetch
+	// "headless"      - use headless Chrome via chromedp
+	// "archive"       - fetch from archive.org Wayback Machine
+	// "headless+archive" - try headless first, fall back to archive
+	// "archive+headless" - try archive first, fall back to headless
+	FetchStrategy string `yaml:"fetchStrategy,omitempty"`
+
+	// HeadlessWaitSeconds is how long to wait for the page to render in headless mode (default: 5)
+	HeadlessWaitSeconds int `yaml:"headlessWaitSeconds,omitempty"`
+
+	// BotDetectionPatterns are strings that indicate a bot-detection page was returned
+	// If any of these are found in the response body, fallback strategies are triggered
+	BotDetectionPatterns []string `yaml:"botDetectionPatterns,omitempty"`
+
 	URLMods struct {
 		Domain []Regex `yaml:"domain,omitempty"`
 		Path   []Regex `yaml:"path,omitempty"`

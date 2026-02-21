@@ -25,6 +25,9 @@ var cssData embed.FS
 //go:embed extension_ladder.png
 var logoData []byte
 
+//go:embed loading_phrases.json
+var loadingPhrasesData []byte
+
 func main() {
 	parser := argparse.NewParser("ladder", "Every Wall needs a Ladder")
 
@@ -142,6 +145,12 @@ func main() {
 		c.Set("Content-Type", "image/png")
 		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		return c.Send(logoData)
+	})
+
+	app.Get("/loading_phrases.json", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "application/json")
+		c.Set("Cache-Control", "no-cache")
+		return c.Send(loadingPhrasesData)
 	})
 
 	app.Get("ruleset", handlers.Ruleset)

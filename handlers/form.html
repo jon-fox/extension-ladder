@@ -22,6 +22,12 @@
                 </button>
             </div>
         </form>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="hidden mx-4 text-center">
+            <div class="spinner"></div>
+            <p id="loadingPhrase" class="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400" style="transition: opacity 0.4s"></p>
+        </div>
         <footer class="mt-10 mx-4 text-center text-slate-600 dark:text-slate-400">
             <p>
                 <a href="https://github.com/jon-fox/extension-ladder" class="hover:text-blue-500 hover:underline underline-offset-2 transition-colors duration-300">View Source</a>
@@ -30,12 +36,38 @@
     </div>
 
     <script>
+        let loadingPhrases = ['Loading...'];
+        let phraseInterval = null;
+
+        // Fetch phrases from config
+        fetch('/loading_phrases.json')
+            .then(r => r.json())
+            .then(data => { if (data.phrases && data.phrases.length) loadingPhrases = data.phrases; })
+            .catch(() => {});
+
+        function showSpinner() {
+            const spinner = document.getElementById('loadingSpinner');
+            const phraseEl = document.getElementById('loadingPhrase');
+            spinner.classList.remove('hidden');
+            let index = Math.floor(Math.random() * loadingPhrases.length);
+            phraseEl.textContent = loadingPhrases[index];
+            phraseInterval = setInterval(() => {
+                phraseEl.style.opacity = '0';
+                setTimeout(() => {
+                    index = (index + 1) % loadingPhrases.length;
+                    phraseEl.textContent = loadingPhrases[index];
+                    phraseEl.style.opacity = '1';
+                }, 400);
+            }, 2500);
+        }
+
         document.getElementById('inputForm').addEventListener('submit', function (e) {
             e.preventDefault();
             let url = document.getElementById('inputField').value;
             if (url.indexOf('http') === -1) {
                 url = 'https://' + url;
             }
+            showSpinner();
             window.location.href = '/' + url;
             return false;
         });
@@ -55,6 +87,19 @@
     </script>
 
     <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            margin: 0 auto;
+            border: 3px solid rgba(100, 150, 200, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
         @media (prefers-color-scheme: light) {
             body {
                 background-color: #ffffff;

@@ -60,8 +60,9 @@ Certain sites may display missing images or encounter formatting issues. This ca
 
 ### Local Development
 1) Install Go: `brew install go`
-2) Clone the repo: `git clone https://github.com/jon-fox/extension-ladder.git`
-3) Run the start script:
+2) Install Chrome (required for headless browser fallback): `brew install --cask google-chrome`
+3) Clone the repo: `git clone https://github.com/jon-fox/extension-ladder.git`
+4) Run the start script:
 ```bash
 cd extension-ladder
 ./local_start.sh
