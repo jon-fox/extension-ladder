@@ -1,5 +1,6 @@
 # dev binary
 extension-ladder
+tmp/
 
 VERSION
 output.css

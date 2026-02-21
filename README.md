@@ -40,6 +40,8 @@ cd extension-ladder
 
 > `local_start.sh` automatically kills any existing process on port 8080 before starting.
 
+> **Hot Reload:** Run `./start_air.sh` instead for auto-rebuild on file changes (installs [Air](https://github.com/air-verse/air) if needed).
+
 > **Styles:** Uses [pnpm](https://pnpm.io/) + [Tailwind CSS](https://tailwindcss.com/). Only needed if editing `form.html` — run `pnpm build` to regenerate CSS.
 
 ### Binary

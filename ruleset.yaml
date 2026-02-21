@@ -9,7 +9,7 @@
     cookie: privacy=1
   regexRules:
     - match: <script\s+([^>]*\s+)?src="(/)([^"]*)"
-      replace: <script $1 script="/https://www.example.com/$3"
+      replace: <script $1 src="/https://www.example.com/$3"
   injections:
     - position: head # Position where to inject the code
       append: |
