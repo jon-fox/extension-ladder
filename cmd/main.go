@@ -22,6 +22,9 @@ var faviconData string
 //go:embed styles.css
 var cssData embed.FS
 
+//go:embed extension_ladder.png
+var logoData []byte
+
 func main() {
 	parser := argparse.NewParser("ladder", "Every Wall needs a Ladder")
 
@@ -133,6 +136,12 @@ func main() {
 		c.Set("Content-Type", "text/css")
 
 		return c.Send(cssData)
+	})
+
+	app.Get("/extension_ladder.png", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "image/png")
+		c.Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		return c.Send(logoData)
 	})
 
 	app.Get("ruleset", handlers.Ruleset)

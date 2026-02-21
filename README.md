@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="assets/pigeon.svg" width="100px">
+    <img src="assets/extension_ladder.png" width="100px">
 </p>
 
 <h1 align="center">Ladder</h1>
