@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">Ladder</h1>
-<div><img alt="License" src="https://img.shields.io/github/license/everywall/ladder"> <img alt="go.mod Go version " src="https://img.shields.io/github/go-mod/go-version/everywall/ladder"> <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/everywall/ladder"> <img alt="GitHub (Pre-)Release Date" src="https://img.shields.io/github/release-date-pre/everywall/ladder"> <img alt="GitHub Downloads all releases" src="https://img.shields.io/github/downloads/everywall/ladder/total"> <img alt="GitHub Build Status (with event)" src="https://img.shields.io/github/actions/workflow/status/everywall/ladder/release-binaries.yaml"></div>
+<div><img alt="License" src="https://img.shields.io/github/license/jon-fox/extension-ladder"> <img alt="go.mod Go version " src="https://img.shields.io/github/go-mod/go-version/jon-fox/extension-ladder"> <img alt="GitHub tag (with filter)" src="https://img.shields.io/github/v/tag/jon-fox/extension-ladder"> <img alt="GitHub (Pre-)Release Date" src="https://img.shields.io/github/release-date-pre/jon-fox/extension-ladder"> <img alt="GitHub Downloads all releases" src="https://img.shields.io/github/downloads/jon-fox/extension-ladder/total"> <img alt="GitHub Build Status (with event)" src="https://img.shields.io/github/actions/workflow/status/jon-fox/extension-ladder/release-binaries.yaml"></div>
 
 
 *Ladder is a http web proxy.* This is a selfhosted version of [1ft.io](https://1ft.io) and [12ft.io](https://12ft.io). It is inspired by [13ft](https://github.com/wasi-master/13ft).
@@ -35,7 +35,7 @@ sequenceDiagram
 - [x] Fetch RAW HTML
 - [x] Custom User Agent
 - [x] Custom X-Forwarded-For IP
-- [x] [Docker container](https://github.com/everywall/ladder/pkgs/container/ladder) (amd64, arm64)
+- [x] [Docker container](https://github.com/jon-fox/extension-ladder/pkgs/container/extension-ladder) (amd64, arm64)
 - [x] Linux binary
 - [x] Mac OS binary
 - [x] Windows binary (untested)
@@ -59,18 +59,18 @@ Certain sites may display missing images or encounter formatting issues. This ca
 > **Warning:** If your instance will be publicly accessible, make sure to enable Basic Auth. This will prevent unauthorized users from using your proxy. If you do not enable Basic Auth, anyone can use your proxy to browse nasty/illegal stuff. And you will be responsible for it.
 
 ### Binary
-1) Download binary [here](https://github.com/everywall/ladder/releases/latest)
+1) Download binary [here](https://github.com/jon-fox/extension-ladder/releases/latest)
 2) Unpack and run the binary `./ladder -r https://t.ly/14PSf`
 3) Open Browser (Default: http://localhost:8080)
 
 ### Docker
 ```bash
-docker run -p 8080:8080 -d --env RULESET=https://t.ly/14PSf --name ladder ghcr.io/everywall/ladder:latest
+docker run -p 8080:8080 -d --env RULESET=https://t.ly/14PSf --name ladder ghcr.io/jon-fox/extension-ladder:latest
 ```
 
 ### Docker Compose
 ```bash
-curl https://raw.githubusercontent.com/everywall/ladder/main/docker-compose.yaml --output docker-compose.yaml
+curl https://raw.githubusercontent.com/jon-fox/extension-ladder/main/docker-compose.yaml --output docker-compose.yaml
 docker-compose up -d
 ```
 
@@ -118,7 +118,7 @@ http://localhost:8080/ruleset
 | `LOG_URLS` | Log fetched URL's | `true` |
 | `DISABLE_FORM` | Disables URL Form Frontpage | `false` |
 | `FORM_PATH` | Path to custom Form HTML | `` |
-| `RULESET` | Path or URL to a ruleset file, accepts local directories | `https://raw.githubusercontent.com/everywall/ladder-rules/main/ruleset.yaml` or `/path/to/my/rules.yaml` or `/path/to/my/rules/` |
+| `RULESET` | Path or URL to a ruleset file, accepts local directories | `https://raw.githubusercontent.com/jon-fox/extension-ladder-rules/main/ruleset.yaml` or `/path/to/my/rules.yaml` or `/path/to/my/rules/` |
 | `EXPOSE_RULESET` | Make your Ruleset available to other ladders | `true` |
 | `ALLOWED_DOMAINS` | Comma separated list of allowed domains. Empty = no limitations | `` |
 | `ALLOWED_DOMAINS_RULESET` | Allow Domains from Ruleset. false = no limitations | `false` |
@@ -129,7 +129,7 @@ http://localhost:8080/ruleset
 
 It is possible to apply custom rules to modify the response or the requested URL. This can be used to remove unwanted or modify elements from the page. The ruleset is a YAML file, a directory with YAML Files, or an URL to a YAML file that contains a list of rules for each domain. These rules are loaded on startup.
 
-There is a basic ruleset available in a separate repository [ruleset.yaml](https://raw.githubusercontent.com/everywall/ladder-rules/main/ruleset.yaml). Feel free to add your own rules and create a pull request.
+There is a basic ruleset available in a separate repository [ruleset.yaml](https://raw.githubusercontent.com/jon-fox/extension-ladder-rules/main/ruleset.yaml). Feel free to add your own rules and create a pull request.
 
 
 ```yaml
